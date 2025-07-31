@@ -10,7 +10,6 @@ export default function EvaluationForm({ onResult }) {
         altura: "",
         actividad: "moderado"
     });
-    const [endpoint, setEndpoint] = useState("evaluate");
     const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
@@ -32,10 +31,7 @@ export default function EvaluationForm({ onResult }) {
             altura: form.altura,
         };
 
-        const isCalories = endpoint === "evaluate-calories";
-        const url = isCalories
-            ? `http://localhost:8000/${endpoint}?actividad=${form.actividad}`
-            : `http://localhost:8000/${endpoint}`;
+        const url = `http://localhost:8000/evaluate-all?actividad=${form.actividad}`;
 
         try {
             const res = await axios.post(url, payload);
@@ -50,20 +46,6 @@ export default function EvaluationForm({ onResult }) {
 
     return (
         <form onSubmit={handleSubmit}>
-
-            <div>
-                <label>Indicador</label>
-                <select
-                    value={endpoint}
-                    onChange={(e) => setEndpoint(e.target.value)}
-                >
-                    <option value="evaluate">IMC</option>
-                    <option value="evaluate-hfa">Altura por edad</option>
-                    <option value="evaluate-wfa">Peso por edad</option>
-                    <option value="evaluate-calories">Requerimiento calórico</option>
-                </select>
-            </div>
-
             <div>
                 <label>Sexo</label>
                 <select name="sexo" value={form.sexo} onChange={handleChange}>
@@ -105,16 +87,14 @@ export default function EvaluationForm({ onResult }) {
                 />
             </div>
 
-            {endpoint === "evaluate-calories" && (
-                <div>
-                    <label>Actividad física</label>
-                    <select name="actividad" value={form.actividad} onChange={handleChange}>
-                        <option value="sedentario">Sedentario</option>
-                        <option value="moderado">Moderado</option>
-                        <option value="activo">Activo</option>
-                    </select>
-                </div>
-            )}
+            <div>
+                <label>Actividad física</label>
+                <select name="actividad" value={form.actividad} onChange={handleChange}>
+                    <option value="sedentario">Sedentario</option>
+                    <option value="moderado">Moderado</option>
+                    <option value="activo">Activo</option>
+                </select>
+            </div>
 
             <button type="submit" disabled={loading}>
                 {loading ? "Evaluando..." : "Evaluar"}

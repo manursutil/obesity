@@ -1,30 +1,59 @@
 const ResultsCard = ({ results }) => {
     if (!results) return null;
 
-    const isCalories = "GET (OMS)" in results;
+    const imc = results.imc || null;
+    const peso = results.peso_por_edad || null;
+    const altura = results.altura_por_edad || null;
+    const calorias = results.calorias || null;
 
     return (
         <div>
             <h2>Resultados</h2>
 
-            {isCalories ? (
+            {imc && (
                 <>
-                    <p><strong>TMB (Schofield):</strong> {results["TMB (Schofield)"]} kcal</p>
-                    <p><strong>TMB (OMS):</strong> {results["TMB (OMS)"]} kcal</p>
-                    <p><strong>GET (Schofield):</strong> {results["GET (Schofield)"]} kcal</p>
-                    <p><strong>GET (OMS):</strong> {results["GET (OMS)"]} kcal</p>
-                    <p><strong>IMC:</strong> {results["IMC"]}</p>
-                    <p><strong>Percentil IMC:</strong> {results["Percentil IMC"]}</p>
-                    <p><strong>Clasificación:</strong> {results["Clasificación OMS"]}</p>
-                    {results.Sugerencia && <p><strong>Sugerencia:</strong> {results.Sugerencia}</p>}
+                    <h3>IMC</h3>
+                    <p><strong>Valor:</strong> {imc.value}</p>
+                    <p><strong>Z-score:</strong> {imc.zscore}</p>
+                    <p><strong>Percentil:</strong> {imc.percentile}</p>
+                    <p><strong>Clasificación:</strong> {imc.classification}</p>
                 </>
-            ) : (
+            )}
+
+            {peso && (
                 <>
-                    <p><strong>Indicador:</strong> {results.type}</p>
-                    <p><strong>Valor:</strong> {results.value}</p>
-                    <p><strong>Z-score:</strong> {results.zscore}</p>
-                    <p><strong>Percentil:</strong> {results.percentile}</p>
-                    <p><strong>Clasificación:</strong> {results.classification}</p>
+                    <h3>Peso por edad</h3>
+                    <p><strong>Valor:</strong> {peso.value}</p>
+                    <p><strong>Z-score:</strong> {peso.zscore}</p>
+                    <p><strong>Percentil:</strong> {peso.percentile}</p>
+                    <p><strong>Clasificación:</strong> {peso.classification}</p>
+                </>
+            )}
+
+            {altura && (
+                <>
+                    <h3>Altura por edad</h3>
+                    <p><strong>Valor:</strong> {altura.value} cm</p>
+                    <p><strong>Z-score:</strong> {altura.zscore}</p>
+                    <p><strong>Percentil:</strong> {altura.percentile}</p>
+                    <p><strong>Clasificación:</strong> {altura.classification}</p>
+                </>
+            )}
+
+            {calorias && (
+                <>
+                    <h3>Requerimiento calórico</h3>
+                    <p><strong>TMB (Schofield):</strong> {calorias["TMB (Schofield)"]} kcal</p>
+                    <p><strong>TMB (OMS):</strong> {calorias["TMB (OMS)"]} kcal</p>
+                    <p><strong>GET (Schofield):</strong> {calorias["GET (Schofield)"]} kcal</p>
+                    <p><strong>GET (OMS):</strong> {calorias["GET (OMS)"]} kcal</p>
+                    <p><strong>IMC:</strong> {calorias["IMC"]}</p>
+                    <p><strong>Percentil IMC:</strong> {calorias["Percentil IMC"]}</p>
+                    <p><strong>Clasificación:</strong> {calorias["Clasificación OMS"]}</p>
+                    <p><strong>Actividad física:</strong> {calorias["Nivel de actividad"]}</p>
+                    {calorias["Sugerencia"] && (
+                        <p><strong>Sugerencia:</strong> {calorias["Sugerencia"]}</p>
+                    )}
                 </>
             )}
         </div>

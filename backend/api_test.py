@@ -34,3 +34,8 @@ print_response("Weight-for-age (/evaluate-wfa)", r_wfa)
 actividad = "moderado"
 r_cal = requests.post(f"{BASE_URL}/evaluate-calories?actividad={actividad}", json=data)
 print_response(f"Calorías (/evaluate-calories?actividad={actividad})", r_cal)
+
+# Test All
+actividad = "moderado"
+r_all = requests.post(f"{BASE_URL}/evaluate-all?actividad={actividad}", json=data)
+print_response(f"Evaluate all (/evaluate-all?actividad={actividad})", r_all)
