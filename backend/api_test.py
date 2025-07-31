@@ -3,10 +3,10 @@ import requests
 BASE_URL = "http://localhost:8000"
 
 data = {
-    "sex": "F",            # Female
-    "age_months": 60,      # 5 years
-    "weight": 18,          # kg
-    "height": 1.05         # m
+    "sexo": "F",
+    "edad_meses": 60,
+    "peso": 18,
+    "altura": 1.05
 }
 
 def print_response(endpoint, response):
@@ -29,3 +29,8 @@ print_response("Height-for-age (/evaluate-hfa)", r_hfa)
 # Test Weight-for-Age
 r_wfa = requests.post(f"{BASE_URL}/evaluate-wfa", json=data)
 print_response("Weight-for-age (/evaluate-wfa)", r_wfa)
+
+# Test Calories
+actividad = "moderado"
+r_cal = requests.post(f"{BASE_URL}/evaluate-calories?actividad={actividad}", json=data)
+print_response(f"Calorías (/evaluate-calories?actividad={actividad})", r_cal)

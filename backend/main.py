@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from pydantic import BaseModel, condecimal, conint, Field
+from typing import Literal
 import pandas as pd
 import numpy as np
 from scipy.stats import norm
@@ -139,3 +140,86 @@ def evaluate_hfa(input: EvaluationInput):
         percentile=round(p, 1),
         classification=category
     )
+    
+@app.post("/evaluate-calories")
+def calculate_calories(
+    input: EvaluationInput,
+    actividad: Literal["sedentario", "moderado", "activo"] = Query("moderado")
+):
+    age_years = input.age_months / 12
+    weight = float(input.weight)
+    height = float(input.height)
+    sex = input.sex
+    age_months = input.age_months
+    sex_code = 1 if sex == "M" else 2
+
+    def schofield(weight, age, sex):
+        if sex == "M":
+            if age < 3:
+                return 59.48 * weight - 30.33
+            elif age < 10:
+                return 22.7 * weight + 505
+            else:
+                return 13.4 * weight + 693
+        else:
+            if age < 3:
+                return 58.29 * weight - 31.05
+            elif age < 10:
+                return 20.3 * weight + 486
+            else:
+                return 17.7 * weight + 659
+
+    def oms(weight, age, sex):
+        if sex == "M":
+            if age < 3:
+                return 60.9 * weight - 54
+            elif age < 10:
+                return 22.7 * weight + 495
+            else:
+                return 17.5 * weight + 651
+        else:
+            if age < 3:
+                return 61 * weight - 51
+            elif age < 10:
+                return 22.4 * weight + 499
+            else:
+                return 12.2 * weight + 746
+
+    tmb_schofield = schofield(weight, age_years, sex)
+    tmb_oms = oms(weight, age_years, sex)
+
+    fa_dict = {
+        "sedentario": 1.3,
+        "moderado": 1.5,
+        "activo": 1.75
+    }
+    fa = fa_dict[actividad]
+    get_schofield = tmb_schofield * fa
+    get_oms = tmb_oms * fa
+
+    imc = weight / (height ** 2)
+    
+    df = who_df[who_df["Sex"] == sex_code]
+    row = df.iloc[(df["Month"] - age_months).abs().argsort().iloc[0]]
+    
+    L, M, S = row["L"], row["M"], row["S"]
+    z = calculate_zscore(imc, L, M, S)
+    p = zscore_to_percentile(z)
+    category = classify_bmi(p)
+
+    suggestion = None
+    if category in ["Sobrepeso", "Obesidad"]:
+        suggestion = f"Se sugiere un déficit suave de 200 kcal: {round(get_oms - 200, 2)} kcal/día como objetivo."
+
+    return {
+        "TMB (Schofield)": round(tmb_schofield, 2),
+        "TMB (OMS)": round(tmb_oms, 2),
+        "GET (Schofield)": round(get_schofield, 2),
+        "GET (OMS)": round(get_oms, 2),
+        "IMC": round(imc, 2),
+        "Percentil IMC": round(p, 1),
+        "Clasificación OMS": category,
+        "Factor de actividad": fa,
+        "Nivel de actividad": actividad,
+        "Sugerencia": suggestion
+    }
