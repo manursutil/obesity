@@ -43,10 +43,10 @@ const ResultsCard = ({ results }) => {
             {calorias && (
                 <>
                     <h3>Requerimiento calórico</h3>
-                    <p><strong>TMB (Schofield):</strong> {calorias["TMB (Schofield)"]} kcal</p>
-                    <p><strong>TMB (OMS):</strong> {calorias["TMB (OMS)"]} kcal</p>
-                    <p><strong>GET (Schofield):</strong> {calorias["GET (Schofield)"]} kcal</p>
-                    <p><strong>GET (OMS):</strong> {calorias["GET (OMS)"]} kcal</p>
+                    <p><strong>Tasa Metabólica Basal (Schofield):</strong> {calorias["TMB (Schofield)"]} kcal</p>
+                    <p><strong>Tasa Metabólica Basal (OMS):</strong> {calorias["TMB (OMS)"]} kcal</p>
+                    <p><strong>Gasto Energético Total (Schofield):</strong> {calorias["GET (Schofield)"]} kcal</p>
+                    <p><strong>Gasto Energético Total  (OMS):</strong> {calorias["GET (OMS)"]} kcal</p>
                     <p><strong>IMC:</strong> {calorias["IMC"]}</p>
                     <p><strong>Percentil IMC:</strong> {calorias["Percentil IMC"]}</p>
                     <p><strong>Clasificación:</strong> {calorias["Clasificación OMS"]}</p>
