@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from pydantic import BaseModel, condecimal, conint
+from pydantic import BaseModel, condecimal, conint, Field
 import pandas as pd
 import numpy as np
 from scipy.stats import norm
@@ -19,10 +19,13 @@ who_df = pd.read_csv("data/who_bmi_clean.csv")
 lms_all_df = pd.read_csv("data/who_lms_all_clean.csv")
 
 class EvaluationInput(BaseModel):
-    sex: str
-    age_months: conint(ge=0, le=228) # type: ignore
-    weight: condecimal(gt=0) # type: ignore
-    height: condecimal(gt=0) # type: ignore
+    sex: str = Field(alias="sexo")
+    age_months: conint(ge=0, le=228) = Field(alias="edad_meses") # type: ignore
+    weight: condecimal(gt=0) = Field(alias="peso") # type: ignore
+    height: condecimal(gt=0) = Field(alias="altura") # type: ignore
+
+    class Config:
+        allow_population_by_field_name = True
     
 class EvaluationResult(BaseModel):
     type: str

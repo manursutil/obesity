@@ -3,9 +3,9 @@ import requests
 BASE_URL = "http://localhost:8000"
 
 data = {
-    "sex": "F",           # Female
+    "sex": "F",            # Female
     "age_months": 60,      # 5 years
-    "weight": 18,            # kg
+    "weight": 18,          # kg
     "height": 1.05         # m
 }
 
