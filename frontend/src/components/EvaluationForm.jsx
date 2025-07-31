@@ -7,7 +7,8 @@ export default function EvaluationForm({ onResult }) {
         sexo: "",
         fecha_nacimiento: "",
         peso: "",
-        altura: ""
+        altura: "",
+        actividad: "moderado"
     });
     const [endpoint, setEndpoint] = useState("evaluate");
     const [loading, setLoading] = useState(false);
@@ -31,8 +32,13 @@ export default function EvaluationForm({ onResult }) {
             altura: form.altura,
         };
 
+        const isCalories = endpoint === "evaluate-calories";
+        const url = isCalories
+            ? `http://localhost:8000/${endpoint}?actividad=${form.actividad}`
+            : `http://localhost:8000/${endpoint}`;
+
         try {
-            const res = await axios.post(`http://localhost:8000/${endpoint}`, payload);
+            const res = await axios.post(url, payload);
             onResult(res.data);
         } catch (err) {
             console.error(err);
@@ -44,9 +50,24 @@ export default function EvaluationForm({ onResult }) {
 
     return (
         <form onSubmit={handleSubmit}>
+
+            <div>
+                <label>Indicador</label>
+                <select
+                    value={endpoint}
+                    onChange={(e) => setEndpoint(e.target.value)}
+                >
+                    <option value="evaluate">IMC</option>
+                    <option value="evaluate-hfa">Altura por edad</option>
+                    <option value="evaluate-wfa">Peso por edad</option>
+                    <option value="evaluate-calories">Requerimiento calórico</option>
+                </select>
+            </div>
+
             <div>
                 <label>Sexo</label>
                 <select name="sexo" value={form.sexo} onChange={handleChange}>
+                    <option value="">Seleccionar</option>
                     <option value="M">Masculino</option>
                     <option value="F">Femenino</option>
                 </select>
@@ -84,22 +105,18 @@ export default function EvaluationForm({ onResult }) {
                 />
             </div>
 
-            <div>
-                <label>Indicador</label>
-                <select
-                    value={endpoint}
-                    onChange={(e) => setEndpoint(e.target.value)}
-                >
-                    <option value="evaluate">IMC</option>
-                    <option value="evaluate-hfa">Altura por edad</option>
-                    <option value="evaluate-wfa">Peso por edad</option>
-                </select>
-            </div>
+            {endpoint === "evaluate-calories" && (
+                <div>
+                    <label>Actividad física</label>
+                    <select name="actividad" value={form.actividad} onChange={handleChange}>
+                        <option value="sedentario">Sedentario</option>
+                        <option value="moderado">Moderado</option>
+                        <option value="activo">Activo</option>
+                    </select>
+                </div>
+            )}
 
-            <button
-                type="submit"
-                disabled={loading}
-            >
+            <button type="submit" disabled={loading}>
                 {loading ? "Evaluando..." : "Evaluar"}
             </button>
         </form>
