@@ -16,6 +16,7 @@ app.add_middleware(
 )
 
 who_df = pd.read_csv("data/who_bmi_clean.csv")
+lms_all_df = pd.read_csv("data/who_lms_all_clean.csv")
 
 class EvaluationInput(BaseModel):
     sex: str
@@ -39,7 +40,7 @@ def calculate_zscore(value, L, M, S):
 def zscore_to_percentile(z):
     return float(norm.cdf(z) * 100)
 
-def classify(percentile):
+def classify_bmi(percentile):
     if percentile < 5:
         return "Bajo peso"
     elif percentile < 85:
@@ -48,6 +49,24 @@ def classify(percentile):
         return "Sobrepeso"
     else:
         return "Obesidad"
+    
+def classify_hfa(z):
+    if z < -2:
+        return "Talla baja"
+    elif z > 2:
+        return "Talla alta"
+    else:
+        return "Talla normal"
+    
+def classify_wfa(z):
+    if z < -3:
+        return "Muy bajo peso"
+    elif z < -2:
+        return "Bajo peso"
+    elif z > 2:
+        return "Sobrepeso"
+    else:
+        return "Peso normal"
     
 @app.post("/evaluate", response_model=EvaluationResult)
 def evaluate(input: EvaluationInput):
@@ -64,7 +83,7 @@ def evaluate(input: EvaluationInput):
     L, M, S = row["L"], row["M"], row["S"]
     z = calculate_zscore(imc, L, M, S)
     p = zscore_to_percentile(z)
-    category = classify(p)
+    category = classify_bmi(p)
 
     return EvaluationResult(
         type="IMC (WHO)",
@@ -72,4 +91,48 @@ def evaluate(input: EvaluationInput):
         zscore=round(z, 2),
         percentile=round(p, 1),
         classification=category,
+    )
+    
+@app.post("/evaluate-wfa", response_model=EvaluationResult)
+def evaluate_wfa(input: EvaluationInput):
+    sex_code = 1 if input.sex.upper() == "M" else 2
+    weight = float(input.weight)
+    age_months = input.age_months
+    
+    df = lms_all_df[(lms_all_df["Type"] == "WFA") & (lms_all_df["Sex"] == sex_code)]
+    row = df.iloc[(df["Month"] - age_months).abs().argsort().iloc[0]]
+    
+    L, M, S = row["L"], row["M"], row["S"]
+    z = calculate_zscore(weight, L, M, S)
+    p = zscore_to_percentile(z)
+    category = classify_wfa(z)
+    
+    return EvaluationResult(
+        type="Peso por edad",
+        value=round(weight, 2),
+        zscore=round(z, 2),
+        percentile=round(p, 1),
+        classification=category
+    )
+    
+@app.post("/evaluate-hfa", response_model=EvaluationResult)
+def evaluate_hfa(input: EvaluationInput):
+    sex_code = 1 if input.sex.upper() == "M" else 2
+    height = float(input.height)
+    age_months = input.age_months
+    
+    df = lms_all_df[(lms_all_df["Type"] == "HFA") & (lms_all_df["Sex"] == sex_code)]
+    row = df.iloc[(df["Month"] - age_months).abs().argsort().iloc[0]]
+    
+    L, M, S = row["L"], row["M"], row["S"]
+    z = calculate_zscore(height * 100, L, M, S)
+    p = zscore_to_percentile(z)
+    category = classify_hfa(z)
+    
+    return EvaluationResult(
+        type="Altura por edad",
+        value=round(height * 100, 1),
+        zscore=round(z, 2),
+        percentile=round(p, 1),
+        classification=category
     )

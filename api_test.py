@@ -1,21 +1,31 @@
 import requests
 
-API_URL = "http://localhost:8000/evaluate"
+BASE_URL = "http://localhost:8000"
 
-input = {
-    "sex": "F",
-    "age_months": 60,
-    "weight": 18,
-    "height": 1.05
+data = {
+    "sex": "F",           # Female
+    "age_months": 60,      # 5 years
+    "weight": 18,            # kg
+    "height": 1.05         # m
 }
 
-response = requests.post(API_URL, json=input)
+def print_response(endpoint, response):
+    print(f"\nTesting {endpoint}")
+    if response.status_code == 200:
+        result = response.json()
+        for key, value in result.items():
+            print(f"{key.capitalize()}: {value}")
+    else:
+        print("Error:", response.status_code, response.text)
 
-if response.status_code == 200:
-    data = response.json()
-    print("API Response:")
-    for key, value in data.items():
-        print(f"{key.capitalize()}: {value}")
-else:
-    print("API Error:", response.status_code)
-    print(response.text)
+# Test BMI (IMC)
+r_bmi = requests.post(f"{BASE_URL}/evaluate", json=data)
+print_response("BMI (/evaluate)", r_bmi)
+
+# Test Height-for-Age
+r_hfa = requests.post(f"{BASE_URL}/evaluate-hfa", json=data)
+print_response("Height-for-age (/evaluate-hfa)", r_hfa)
+
+# Test Weight-for-Age
+r_wfa = requests.post(f"{BASE_URL}/evaluate-wfa", json=data)
+print_response("Weight-for-age (/evaluate-wfa)", r_wfa)
