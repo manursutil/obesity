@@ -1,0 +1,8 @@
+fastapi
+pydantic
+pandas
+numpy
+scipy
+ipykernel
+uvicorn
+requests

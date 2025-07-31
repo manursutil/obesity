@@ -1,0 +1,8 @@
+.vscode
+.DS_Store
+venv
+.ipynb_checkpoints
+.jupyter
+.virtual_documents
+anaconda_projects
+__pychache__
