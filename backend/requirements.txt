@@ -6,3 +6,6 @@ scipy
 ipykernel
 uvicorn
 requests
+google-genai
+dotenv
+httpx

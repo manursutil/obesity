@@ -5,6 +5,14 @@ import pandas as pd
 import numpy as np
 from scipy.stats import norm
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv # type: ignore
+import os
+import json
+from google import genai # type: ignore
+from google.genai import types # type: ignore
+
+load_dotenv()
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 app = FastAPI()
 
@@ -71,14 +79,59 @@ def classify_wfa(z):
         return "Sobrepeso"
     else:
         return "Peso normal"
+    
+def get_nutritional_reference(age_months: int, sex: str):
+    edad = age_months / 12
+    reference = {
+        "4-5": {
+            "kcal": 1700, "proteinas_g": 30, "Ca_mg": 700, "Fe_mg": 9,
+            "Zn_mg": 10, "Vitamina_C_mg": 55, "Vitamina_D_ug": 15
+        },
+        "6-9": {
+            "kcal": 2000, "proteinas_g": 36, "Ca_mg": 800, "Fe_mg": 9,
+            "Zn_mg": 10, "Vitamina_C_mg": 55, "Vitamina_D_ug": 15
+        },
+        "10-12_M": {
+            "kcal": 2450, "proteinas_g": 43, "Ca_mg": 1300, "Fe_mg": 12,
+            "Zn_mg": 15, "Vitamina_C_mg": 60, "Vitamina_D_ug": 15
+        },
+        "10-12_F": {
+            "kcal": 2300, "proteinas_g": 41, "Ca_mg": 1300, "Fe_mg": 18,
+            "Zn_mg": 15, "Vitamina_C_mg": 60, "Vitamina_D_ug": 15
+        },
+        "13-15_M": {
+            "kcal": 2750, "proteinas_g": 54, "Ca_mg": 1300, "Fe_mg": 12,
+            "Zn_mg": 15, "Vitamina_C_mg": 60, "Vitamina_D_ug": 15
+        },
+        "13-15_F": {
+            "kcal": 2500, "proteinas_g": 45, "Ca_mg": 1300, "Fe_mg": 18,
+            "Zn_mg": 15, "Vitamina_C_mg": 60, "Vitamina_D_ug": 15
+        },
+        "16-19_M": {
+            "kcal": 3000, "proteinas_g": 56, "Ca_mg": 1300, "Fe_mg": 15,
+            "Zn_mg": 15, "Vitamina_C_mg": 60, "Vitamina_D_ug": 15
+        },
+        "16-19_F": {
+            "kcal": 2300, "proteinas_g": 43, "Ca_mg": 1300, "Fe_mg": 18,
+            "Zn_mg": 15, "Vitamina_C_mg": 60, "Vitamina_D_ug": 15
+        }
+    }
+    if 4 <= edad < 6:
+        return reference["4-5"]
+    elif 6 <= edad < 10:
+        return reference["6-9"]
+    elif 10 <= edad < 13:
+        return reference[f"10-12_{'M' if sex == 'M' else 'F'}"]
+    elif 13 <= edad < 16:
+        return reference[f"13-15_{'M' if sex == 'M' else 'F'}"]
+    else:
+        return reference[f"16-19_{'M' if sex == 'M' else 'F'}"]
 
 @app.post("/evaluate-all")
 def evaluate_all(
     input: EvaluationInput,
     actividad: Literal["sedentario", "moderado", "activo"] = Query("moderado")
 ):
-    from fastapi import Request
-    
     def get_bmi_result():
         sex_code = 1 if input.sex.upper() == "M" else 2
         weight = float(input.weight)
@@ -225,3 +278,68 @@ def evaluate_all(
         "calorias": get_caloric_result()
     }
     
+@app.post("/generate-mealplan")
+def generate_mealplan(input: EvaluationInput, actividad: Literal["sedentario", "moderado", "activo"] = Query("moderado")):
+    results = evaluate_all(input, actividad)
+    calorias = results["calorias"]["GET (OMS)"]
+    sugerencia = results["calorias"].get("Sugerencia")
+    referencias = get_nutritional_reference(input.age_months, input.sex)
+
+    response_format = {
+        "plan": {
+            day: {
+                "calorias_totales": 0,
+                "macros": {
+                    "carbohidratos": 0,
+                    "proteinas": 0,
+                    "grasas": 0
+                },
+                "comidas": {
+                    "desayuno": [],
+                    "media_manana": [],
+                    "almuerzo": [],
+                    "merienda": [],
+                    "cena": []
+                }
+            } for day in ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+        }
+    }
+
+    prompt = f"""
+        Eres un nutricionista pediátrico. Genera un menú semanal con 3 comidas principales y 2 meriendas para un niño con los siguientes datos:
+        - Sexo: {input.sex}
+        - Edad en meses: {input.age_months}
+        - Peso: {input.weight} kg
+        - Altura: {input.height} m
+        - Clasificación OMS: {results['calorias']['Clasificación OMS']}
+        - GET diario (OMS): {calorias} kcal
+        - Sugerencia: {sugerencia or 'Ninguna'}
+
+        Utiliza esta guía nutricional:
+        {json.dumps(referencias, indent=2)}
+
+        Devuelve únicamente un JSON **válido**, sin texto adicional, con el siguiente formato:
+        {json.dumps(response_format, indent=2)}
+    """
+
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                thinking_config=types.ThinkingConfig(thinking_budget=0)
+            )
+        )
+
+        print("RAW GEMINI RESPONSE:\n", response.text)  # debugging
+
+        try:
+            return json.loads(response.text)
+        except json.JSONDecodeError:
+            return {
+                "error": "La respuesta no es JSON válido.",
+                "raw_output": response.text
+            }
+
+    except Exception as e:
+        return {"error": str(e)}

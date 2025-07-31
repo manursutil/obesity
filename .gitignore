@@ -6,3 +6,4 @@ venv
 .virtual_documents
 anaconda_projects
 __pychache__
+.env
