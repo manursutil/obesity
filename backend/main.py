@@ -331,14 +331,21 @@ def generate_mealplan(input: EvaluationInput, actividad: Literal["sedentario", "
             )
         )
 
-        print("RAW GEMINI RESPONSE:\n", response.text)  # debugging
+        text = response.text.strip()
+
+        if text.startswith("```json"):
+            text = text.lstrip("```json").rstrip("```").strip()
+        elif text.startswith("```"):
+            text = text.lstrip("```").rstrip("```").strip()
+
+        print("CLEANED RESPONSE:\n", text)
 
         try:
-            return json.loads(response.text)
+            return json.loads(text)
         except json.JSONDecodeError:
             return {
                 "error": "La respuesta no es JSON válido.",
-                "raw_output": response.text
+                "raw_output": text
             }
 
     except Exception as e:

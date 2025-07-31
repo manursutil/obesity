@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { differenceInMonths, parseISO } from "date-fns";
 
-export default function EvaluationForm({ onResult }) {
+export default function EvaluationForm({ onResult, onMealplan }) {
     const [form, setForm] = useState({
         sexo: "",
         fecha_nacimiento: "",
@@ -17,21 +17,27 @@ export default function EvaluationForm({ onResult }) {
         setForm({ ...form, [name]: value });
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
+    const buildPayload = () => {
         const today = new Date();
         const dob = parseISO(form.fecha_nacimiento);
         const edad_meses = differenceInMonths(today, dob);
 
-        const payload = {
-            sexo: form.sexo,
-            edad_meses,
-            peso: form.peso,
-            altura: form.altura,
+        return {
+            payload: {
+                sexo: form.sexo,
+                edad_meses,
+                peso: form.peso,
+                altura: form.altura,
+            },
+            actividad: form.actividad
         };
+    };
 
-        const url = `http://localhost:8000/evaluate-all?actividad=${form.actividad}`;
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        const { payload, actividad } = buildPayload();
+        const url = `http://localhost:8000/evaluate-all?actividad=${actividad}`;
 
         try {
             const res = await axios.post(url, payload);
@@ -43,6 +49,23 @@ export default function EvaluationForm({ onResult }) {
             setLoading(false);
         }
     };
+
+    const handleMealplan = async () => {
+        setLoading(true);
+        const { payload, actividad } = buildPayload();
+        const url = `http://localhost:8000/generate-mealplan?actividad=${actividad}`;
+
+        try {
+            const res = await axios.post(url, payload);
+            onMealplan(res.data);
+        } catch (err) {
+            console.error(err);
+            onMealplan(null);
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     return (
         <form onSubmit={handleSubmit}>
@@ -98,6 +121,10 @@ export default function EvaluationForm({ onResult }) {
 
             <button type="submit" disabled={loading}>
                 {loading ? "Evaluando..." : "Evaluar"}
+            </button>
+
+            <button type="button" onClick={handleMealplan} disabled={loading} style={{ marginLeft: "1rem" }}>
+                {loading ? "Generando..." : "Generar plan alimenticio"}
             </button>
         </form>
     );
