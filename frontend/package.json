@@ -13,12 +13,8 @@
     "@tailwindcss/vite": "^4.1.11",
     "axios": "^1.11.0",
     "date-fns": "^4.1.0",
-    "html2canvas": "^1.4.1",
-    "html2pdf.js": "^0.10.3",
-    "jspdf": "^3.0.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-to-print": "^3.1.1",
     "recharts": "^3.1.0",
     "tailwindcss": "^4.1.11"
   },
