@@ -9,13 +9,13 @@ const App = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 text-gray-900 font-sans">
-      <h1 className="p-6 sm:p-8 text-xl sm:text-2xl font-bold text-center">
+      <h1 className="p-6 sm:p-8 text-2xl sm:text-3xl font-extrabold text-center text-sky-600 tracking-tight">
         Evaluación de Obesidad Infantil
       </h1>
 
-      <main className="flex-1 max-w-7xl mx-auto px-4 py-4 sm:py-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <main className="flex-1 max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 sm:p-6">
+          <div className="bg-white border border-gray-200 rounded-2xl shadow-md p-6 hover:ring-1 hover:ring-sky-200 transition">
             <EvaluationForm onResult={setResults} onMealplan={setMealplan} />
           </div>
         </div>
@@ -24,7 +24,7 @@ const App = () => {
           {results ? (
             <ResultsCard results={results} />
           ) : (
-            <div className="bg-white border border-dashed border-gray-200 rounded-lg p-6 text-center text-gray-400 text-sm italic min-h-[100px]">
+            <div className="bg-white border border-dashed border-gray-200 rounded-2xl p-6 text-center text-gray-400 text-sm italic min-h-[100px]">
               Los resultados se mostrarán aquí después de evaluar.
             </div>
           )}
@@ -32,14 +32,14 @@ const App = () => {
           {mealplan ? (
             <MealPlanViewer plan={mealplan} />
           ) : (
-            <div className="bg-white border border-dashed border-gray-200 rounded-lg p-6 text-center text-gray-400 text-sm italic min-h-[100px]">
+            <div className="bg-white border border-dashed border-gray-200 rounded-2xl p-6 text-center text-gray-400 text-sm italic min-h-[100px]">
               El plan alimenticio aparecerá aquí después de generarlo.
             </div>
           )}
         </div>
       </main>
-
     </div>
+
   );
 };
 

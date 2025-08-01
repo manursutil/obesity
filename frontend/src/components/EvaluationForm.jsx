@@ -8,7 +8,7 @@ export default function EvaluationForm({ onResult, onMealplan }) {
         fecha_nacimiento: "",
         peso: "",
         altura: "",
-        actividad: "moderado"
+        actividad: "moderado",
     });
     const [loading, setLoading] = useState(false);
 
@@ -27,9 +27,9 @@ export default function EvaluationForm({ onResult, onMealplan }) {
                 sexo: form.sexo,
                 edad_meses,
                 peso: form.peso,
-                altura: form.altura
+                altura: form.altura,
             },
-            actividad: form.actividad
+            actividad: form.actividad,
         };
     };
 
@@ -70,42 +70,42 @@ export default function EvaluationForm({ onResult, onMealplan }) {
         <form onSubmit={handleSubmit} className="space-y-4">
             {[
                 {
-                    label: "Sexo",
+                    label: "👤 Sexo",
                     name: "sexo",
                     type: "select",
                     options: [
                         { value: "", label: "Seleccionar" },
                         { value: "M", label: "Masculino" },
-                        { value: "F", label: "Femenino" }
-                    ]
+                        { value: "F", label: "Femenino" },
+                    ],
                 },
                 {
-                    label: "Fecha de nacimiento",
+                    label: "🎂 Fecha de nacimiento",
                     name: "fecha_nacimiento",
-                    type: "date"
+                    type: "date",
                 },
                 {
-                    label: "Peso (kg)",
+                    label: "⚖️ Peso (kg)",
                     name: "peso",
                     type: "number",
-                    step: "0.1"
+                    step: "0.1",
                 },
                 {
-                    label: "Altura (m)",
+                    label: "📏 Altura (m)",
                     name: "altura",
                     type: "number",
-                    step: "0.01"
+                    step: "0.01",
                 },
                 {
-                    label: "Actividad física",
+                    label: "🏃‍♂️ Actividad física",
                     name: "actividad",
                     type: "select",
                     options: [
                         { value: "sedentario", label: "Sedentario" },
                         { value: "moderado", label: "Moderado" },
-                        { value: "activo", label: "Activo" }
-                    ]
-                }
+                        { value: "activo", label: "Activo" },
+                    ],
+                },
             ].map((field) => (
                 <div key={field.name}>
                     <label className="block text-sm font-medium text-gray-700 mb-1">{field.label}</label>
@@ -114,7 +114,7 @@ export default function EvaluationForm({ onResult, onMealplan }) {
                             name={field.name}
                             value={form[field.name]}
                             onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-teal-500"
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
                         >
                             {field.options.map((opt) => (
                                 <option key={opt.value} value={opt.value}>
@@ -129,7 +129,7 @@ export default function EvaluationForm({ onResult, onMealplan }) {
                             value={form[field.name]}
                             onChange={handleChange}
                             step={field.step}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-teal-500"
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
                         />
                     )}
                 </div>
@@ -139,7 +139,7 @@ export default function EvaluationForm({ onResult, onMealplan }) {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="px-4 py-1.5 text-sm rounded-full border border-gray-300 hover:bg-gray-100 transition disabled:opacity-50"
+                    className="px-4 py-1.5 text-sm rounded-full bg-sky-500 text-white hover:bg-sky-600 transition disabled:opacity-50"
                 >
                     {loading ? "Evaluando..." : "Evaluar"}
                 </button>
@@ -147,7 +147,7 @@ export default function EvaluationForm({ onResult, onMealplan }) {
                     type="button"
                     onClick={handleMealplan}
                     disabled={loading}
-                    className="px-4 py-1.5 text-sm rounded-full border border-gray-300 hover:bg-gray-100 transition disabled:opacity-50"
+                    className="px-4 py-1.5 text-sm rounded-full border border-sky-500 text-sky-600 hover:bg-sky-50 transition disabled:opacity-50"
                 >
                     {loading ? "Generando..." : "Generar plan"}
                 </button>
