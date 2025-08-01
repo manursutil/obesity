@@ -27,7 +27,7 @@ export default function EvaluationForm({ onResult, onMealplan }) {
                 sexo: form.sexo,
                 edad_meses,
                 peso: form.peso,
-                altura: form.altura,
+                altura: form.altura
             },
             actividad: form.actividad
         };
@@ -66,66 +66,92 @@ export default function EvaluationForm({ onResult, onMealplan }) {
         }
     };
 
-
     return (
-        <form onSubmit={handleSubmit}>
-            <div>
-                <label>Sexo</label>
-                <select name="sexo" value={form.sexo} onChange={handleChange}>
-                    <option value="">Seleccionar</option>
-                    <option value="M">Masculino</option>
-                    <option value="F">Femenino</option>
-                </select>
+        <form onSubmit={handleSubmit} className="space-y-4">
+            {[
+                {
+                    label: "Sexo",
+                    name: "sexo",
+                    type: "select",
+                    options: [
+                        { value: "", label: "Seleccionar" },
+                        { value: "M", label: "Masculino" },
+                        { value: "F", label: "Femenino" }
+                    ]
+                },
+                {
+                    label: "Fecha de nacimiento",
+                    name: "fecha_nacimiento",
+                    type: "date"
+                },
+                {
+                    label: "Peso (kg)",
+                    name: "peso",
+                    type: "number",
+                    step: "0.1"
+                },
+                {
+                    label: "Altura (m)",
+                    name: "altura",
+                    type: "number",
+                    step: "0.01"
+                },
+                {
+                    label: "Actividad física",
+                    name: "actividad",
+                    type: "select",
+                    options: [
+                        { value: "sedentario", label: "Sedentario" },
+                        { value: "moderado", label: "Moderado" },
+                        { value: "activo", label: "Activo" }
+                    ]
+                }
+            ].map((field) => (
+                <div key={field.name}>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{field.label}</label>
+                    {field.type === "select" ? (
+                        <select
+                            name={field.name}
+                            value={form[field.name]}
+                            onChange={handleChange}
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-teal-500"
+                        >
+                            {field.options.map((opt) => (
+                                <option key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                </option>
+                            ))}
+                        </select>
+                    ) : (
+                        <input
+                            type={field.type}
+                            name={field.name}
+                            value={form[field.name]}
+                            onChange={handleChange}
+                            step={field.step}
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-teal-500"
+                        />
+                    )}
+                </div>
+            ))}
+
+            <div className="flex gap-3 pt-2">
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="px-4 py-1.5 text-sm rounded-full border border-gray-300 hover:bg-gray-100 transition disabled:opacity-50"
+                >
+                    {loading ? "Evaluando..." : "Evaluar"}
+                </button>
+                <button
+                    type="button"
+                    onClick={handleMealplan}
+                    disabled={loading}
+                    className="px-4 py-1.5 text-sm rounded-full border border-gray-300 hover:bg-gray-100 transition disabled:opacity-50"
+                >
+                    {loading ? "Generando..." : "Generar plan"}
+                </button>
             </div>
-
-            <div>
-                <label>Fecha de nacimiento</label>
-                <input
-                    type="date"
-                    name="fecha_nacimiento"
-                    value={form.fecha_nacimiento}
-                    onChange={handleChange}
-                />
-            </div>
-
-            <div>
-                <label>Peso (kg)</label>
-                <input
-                    type="number"
-                    name="peso"
-                    value={form.peso}
-                    onChange={handleChange}
-                    step="0.1"
-                />
-            </div>
-
-            <div>
-                <label>Altura (m)</label>
-                <input
-                    type="number"
-                    name="altura"
-                    value={form.altura}
-                    onChange={handleChange}
-                    step="0.01"
-                />
-            </div>
-
-            <div>
-                <label>Actividad física</label>
-                <select name="actividad" value={form.actividad} onChange={handleChange}>
-                    <option value="sedentario">Sedentario</option>
-                    <option value="moderado">Moderado</option>
-                    <option value="activo">Activo</option>
-                </select>
-            </div>
-
-            <button type="submit" disabled={loading}>
-                {loading ? "Evaluando..." : "Evaluar"}
-            </button>
-
-            <button type="button" onClick={handleMealplan} disabled={loading} style={{ marginLeft: "1rem" }}>
-                {loading ? "Generando..." : "Generar plan alimenticio"}
-            </button>
         </form>
     );
 }
