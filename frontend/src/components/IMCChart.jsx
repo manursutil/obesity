@@ -1,24 +1,63 @@
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    Tooltip,
+    ResponsiveContainer,
+    CartesianGrid,
+    LabelList,
+    Cell,
+} from "recharts";
 
-const IMCChart = ({ imc, calorias }) => {
-    if (!imc || !calorias) return null;
+const IMCChart = ({ imc, peso_por_edad, altura_por_edad }) => {
+    // Protección: si no llegan los datos aún
+    if (!imc || !peso_por_edad || !altura_por_edad) return null;
 
     const data = [
-        { name: 'IMC actual', value: parseFloat(calorias["IMC"]) },
-        { name: 'Percentil', value: imc.percentile },
-        { name: 'Z-score', value: imc.zscore },
+        {
+            nombre: "IMC",
+            percentil: imc.percentile,
+            color: "#0ea5e9", // sky-500
+        },
+        {
+            nombre: "Peso",
+            percentil: peso_por_edad.percentile,
+            color: "#10b981", // emerald-500
+        },
+        {
+            nombre: "Altura",
+            percentil: altura_por_edad.percentile,
+            color: "#6366f1", // indigo-500
+        },
     ];
 
     return (
-        <div className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
-            <h3 className="text-sm font-semibold text-sky-700 mb-2">📊 IMC y percentiles</h3>
-            <ResponsiveContainer width="100%" height={200}>
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-md hover:shadow-lg transition">
+            <h3 className="text-sm font-semibold text-sky-700 mb-3">
+                Percentiles actuales por indicador
+            </h3>
+
+            <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={data}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="value" fill="#38bdf8" radius={[8, 8, 0, 0]} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="nombre" tick={{ fontSize: 12 }} />
+                    <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
+                    <Tooltip formatter={(value) => `${value.toFixed(1)}%`} />
+                    <Bar
+                        dataKey="percentil"
+                        isAnimationActive={true}
+                        radius={[4, 4, 0, 0]}
+                    >
+                        <LabelList
+                            dataKey="percentil"
+                            position="top"
+                            formatter={(value) => `${value.toFixed(1)}%`}
+                        />
+                        {data.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                    </Bar>
                 </BarChart>
             </ResponsiveContainer>
         </div>
