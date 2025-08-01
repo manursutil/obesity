@@ -11,24 +11,23 @@ import {
 } from "recharts";
 
 const IMCChart = ({ imc, peso_por_edad, altura_por_edad }) => {
-    // Protección: si no llegan los datos aún
     if (!imc || !peso_por_edad || !altura_por_edad) return null;
 
     const data = [
         {
             nombre: "IMC",
             percentil: imc.percentile,
-            color: "#0ea5e9", // sky-500
+            color: "#0ea5e9",
         },
         {
             nombre: "Peso",
             percentil: peso_por_edad.percentile,
-            color: "#10b981", // emerald-500
+            color: "#10b981",
         },
         {
             nombre: "Altura",
             percentil: altura_por_edad.percentile,
-            color: "#6366f1", // indigo-500
+            color: "#6366f1",
         },
     ];
 
