@@ -12,13 +12,6 @@ const ResultsCard = ({ results }) => {
         <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4 shadow-md text-sm text-gray-800 hover:ring-1 hover:ring-sky-200 transition">
             <h2 className="text-base font-semibold text-gray-900 tracking-tight">Resultados</h2>
 
-            <IMCChart
-                imc={results.imc}
-                peso_por_edad={results.peso_por_edad}
-                altura_por_edad={results.altura_por_edad}
-            />
-
-
             {calorias && (
                 <details open className="border border-gray-100 rounded-xl p-4 bg-gray-50 hover:ring-1 hover:ring-sky-300 transition-all hover:scale-[1.02]">
                     <summary className="cursor-pointer text-sm font-semibold text-sky-700 tracking-tight">
@@ -30,7 +23,6 @@ const ResultsCard = ({ results }) => {
                         <p><strong>Gasto Energético Total (Schofield):</strong> {calorias["GET (Schofield)"]} kcal</p>
                         <p><strong>Gasto Energético Total (OMS):</strong> {calorias["GET (OMS)"]} kcal</p>
                         <p><strong>IMC:</strong> {calorias["IMC"]}</p>
-                        <p><strong>Percentil IMC:</strong> {calorias["Percentil IMC"]}</p>
                         <p>
                             <strong>Clasificación:</strong>
                             <span className={`ml-2 px-2 py-0.5 text-xs rounded-full ${calorias["Clasificación OMS"] === "Normal"

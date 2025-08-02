@@ -50,7 +50,12 @@ def calculate_zscore(value, L, M, S):
         return ((value / M) ** L - 1) / (L * S)
     
 def zscore_to_percentile(z):
-    return float(norm.cdf(z) * 100)
+    p = float(norm.cdf(z) * 100)
+    if p > 97:
+        return {"percentile": p, "label": "Por encima del percentil 97"}
+    elif p < 3:
+        return {"percentile": p, "label": "Por debajo del percentil 3"}
+    return {"percentile": p, "label": None}
 
 def classify_bmi(percentile):
     if percentile < 5:
@@ -144,14 +149,18 @@ def evaluate_all(
         
         L, M, S = row["L"], row["M"], row["S"]
         z = calculate_zscore(imc, L, M, S)
-        p = zscore_to_percentile(z)
-        
+        p_result = zscore_to_percentile(z)
+        p = p_result["percentile"]
+        label = p_result["label"]
+        clasificacion = classify_bmi(p)
+
         return {
             "type": "IMC (OMS)",
             "value": round(imc, 2),
             "zscore": round(z, 2),
-            "percentile": round(p, 1),
-            "classification": classify_bmi(p)
+            "percentile": p,
+            "classification": clasificacion,
+            "percentile_label": label
         }
 
     def get_hfa_result():
@@ -164,14 +173,17 @@ def evaluate_all(
         
         L, M, S = row["L"], row["M"], row["S"]
         z = calculate_zscore(height * 100, L, M, S)
-        p = zscore_to_percentile(z)
-        
+        p_result = zscore_to_percentile(z)
+        p = p_result["percentile"]
+
+        classification = classify_hfa(z)
+
         return {
             "type": "Altura por edad",
             "value": round(height * 100, 1),
             "zscore": round(z, 2),
             "percentile": round(p, 1),
-            "classification": classify_hfa(z)
+            "classification": classification
         }
 
     def get_wfa_result():
@@ -184,14 +196,17 @@ def evaluate_all(
         
         L, M, S = row["L"], row["M"], row["S"]
         z = calculate_zscore(weight, L, M, S)
-        p = zscore_to_percentile(z)
-        
+        p_result = zscore_to_percentile(z)
+        p = p_result["percentile"]
+
+        classification = classify_wfa(z)
+
         return {
             "type": "Peso por edad",
             "value": round(weight, 2),
             "zscore": round(z, 2),
             "percentile": round(p, 1),
-            "classification": classify_wfa(z)
+            "classification": classification
         }
 
     def get_caloric_result():
@@ -251,7 +266,9 @@ def evaluate_all(
         row = df.iloc[(df["Month"] - edad_meses).abs().argsort().iloc[0]]
         L, M, S = row["L"], row["M"], row["S"]
         z = calculate_zscore(imc, L, M, S)
-        p = zscore_to_percentile(z)
+        p_result = zscore_to_percentile(z)
+        p = p_result["percentile"]
+        label = p_result["label"]
         clasificacion = classify_bmi(p)
 
         sugerencia = None
@@ -264,8 +281,9 @@ def evaluate_all(
             "GET (Schofield)": round(get_schofield, 2),
             "GET (OMS)": round(get_oms, 2),
             "IMC": round(imc, 2),
-            "Percentil IMC": round(p, 1),
+            "Percentil IMC": p,
             "Clasificación OMS": clasificacion,
+            "percentile_label": label,
             "Factor de actividad": fa,
             "Nivel de actividad": actividad,
             "Sugerencia": sugerencia

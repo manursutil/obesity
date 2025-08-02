@@ -42,7 +42,7 @@ const IMCChart = ({ imc, peso_por_edad, altura_por_edad }) => {
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                     <XAxis dataKey="nombre" tick={{ fontSize: 12 }} />
                     <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
-                    <Tooltip formatter={(value) => `${value.toFixed(1)}%`} />
+                    <Tooltip formatter={(value) => `${value.toFixed(1)}`} />
                     <Bar
                         dataKey="percentil"
                         isAnimationActive={true}
@@ -51,7 +51,7 @@ const IMCChart = ({ imc, peso_por_edad, altura_por_edad }) => {
                         <LabelList
                             dataKey="percentil"
                             position="top"
-                            formatter={(value) => `${value.toFixed(1)}%`}
+                            formatter={(value) => `Percentil ${value.toFixed(1)}`}
                         />
                         {data.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
