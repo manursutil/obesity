@@ -1,157 +1,81 @@
 import { useState } from "react";
-import axios from "axios";
-import { differenceInMonths, parseISO } from "date-fns";
+import EvaluationForm from "./components/EvaluationForm";
+import ResultsCard from "./components/ResultsCard";
+import MealPlanViewer from "./components/MealPlanViewer";
 
-export default function EvaluationForm({ onResult, onMealplan }) {
-    const [form, setForm] = useState({
-        sexo: "",
-        fecha_nacimiento: "",
-        peso: "",
-        altura: "",
-        actividad: "moderado",
-    });
-    const [loading, setLoading] = useState(false);
+const App = () => {
+    const [results, setResults] = useState(null);
+    const [mealplan, setMealplan] = useState(null);
+    const [view, setView] = useState("form"); // "form" | "results"
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setForm({ ...form, [name]: value });
+    const handleComplete = ({ results, mealplan }) => {
+        setResults(results);
+        setMealplan(mealplan);
+        setView("results");
     };
 
-    const buildPayload = () => {
-        const today = new Date();
-        const dob = parseISO(form.fecha_nacimiento);
-        const edad_meses = differenceInMonths(today, dob);
-
-        return {
-            payload: {
-                sexo: form.sexo,
-                edad_meses,
-                peso: form.peso,
-                altura: form.altura,
-            },
-            actividad: form.actividad,
-        };
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        const { payload, actividad } = buildPayload();
-        const url = `http://localhost:8000/evaluate-all?actividad=${actividad}`;
-
-        try {
-            const res = await axios.post(url, payload);
-            onResult(res.data);
-        } catch (err) {
-            console.error(err);
-            onResult(null);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleMealplan = async () => {
-        setLoading(true);
-        const { payload, actividad } = buildPayload();
-        const url = `http://localhost:8000/generate-mealplan?actividad=${actividad}`;
-
-        try {
-            const res = await axios.post(url, payload);
-            onMealplan(res.data);
-        } catch (err) {
-            console.error(err);
-            onMealplan(null);
-        } finally {
-            setLoading(false);
-        }
+    const handleBack = () => {
+        setResults(null);
+        setMealplan(null);
+        setView("form");
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
-            {[
-                {
-                    label: "👤 Sexo",
-                    name: "sexo",
-                    type: "select",
-                    options: [
-                        { value: "", label: "Seleccionar" },
-                        { value: "M", label: "Masculino" },
-                        { value: "F", label: "Femenino" },
-                    ],
-                },
-                {
-                    label: "🎂 Fecha de nacimiento",
-                    name: "fecha_nacimiento",
-                    type: "date",
-                },
-                {
-                    label: "⚖️ Peso (kg)",
-                    name: "peso",
-                    type: "number",
-                    step: "0.1",
-                },
-                {
-                    label: "📏 Altura (m)",
-                    name: "altura",
-                    type: "number",
-                    step: "0.01",
-                },
-                {
-                    label: "🏃‍♂️ Actividad física",
-                    name: "actividad",
-                    type: "select",
-                    options: [
-                        { value: "sedentario", label: "Sedentario" },
-                        { value: "moderado", label: "Moderado" },
-                        { value: "activo", label: "Activo" },
-                    ],
-                },
-            ].map((field) => (
-                <div key={field.name}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{field.label}</label>
-                    {field.type === "select" ? (
-                        <select
-                            name={field.name}
-                            value={form[field.name]}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-                        >
-                            {field.options.map((opt) => (
-                                <option key={opt.value} value={opt.value}>
-                                    {opt.label}
-                                </option>
-                            ))}
-                        </select>
-                    ) : (
-                        <input
-                            type={field.type}
-                            name={field.name}
-                            value={form[field.name]}
-                            onChange={handleChange}
-                            step={field.step}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-                        />
-                    )}
-                </div>
-            ))}
+        <div className="relative min-h-screen text-gray-800">
+            {/* --- Soft background layers --- */}
+            {/* Base soft gradient */}
+            <div className="absolute inset-0 -z-10 bg-gradient-to-br from-sky-50 via-white to-teal-50" />
+            {/* Gentle radial blobs */}
+            <div className="pointer-events-none absolute inset-0 -z-10 opacity-30 [background-image:radial-gradient(circle_at_20%_20%,theme(colors.sky.100/.6),transparent_40%),radial-gradient(circle_at_80%_30%,theme(colors.teal.100/.6),transparent_40%),radial-gradient(circle_at_50%_80%,theme(colors.pink.50/.5),transparent_40%)]" />
+            {/* Subtle tech grid */}
+            <div className="pointer-events-none absolute inset-0 -z-10 opacity-15 [background-image:linear-gradient(to_right,transparent_0,transparent_31px,rgba(2,132,199,.08)_31px,rgba(2,132,199,.08)_32px),linear-gradient(to_bottom,transparent_0,transparent_31px,rgba(13,148,136,.08)_31px,rgba(13,148,136,.08)_32px)] [background-size:32px_32px]" />
 
-            <div className="flex gap-3 pt-2">
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="px-4 py-1.5 text-sm rounded-full bg-sky-500 text-white hover:bg-sky-600 transition disabled:opacity-50"
-                >
-                    {loading ? "Evaluando..." : "Evaluar"}
-                </button>
-                <button
-                    type="button"
-                    onClick={handleMealplan}
-                    disabled={loading}
-                    className="px-4 py-1.5 text-sm rounded-full border border-sky-500 text-sky-600 hover:bg-sky-50 transition disabled:opacity-50"
-                >
-                    {loading ? "Generando..." : "Generar plan"}
-                </button>
-            </div>
-        </form>
+            <header className="px-6 pt-10 pb-6 text-center">
+                <div className="inline-flex items-center gap-2 rounded-full border border-sky-100 bg-white/80 backdrop-blur px-3 py-1 text-xs">
+                    <span>🩺</span>
+                    <span className="uppercase tracking-wide text-sky-700">Pediatría</span>
+                    <span>👶</span>
+                </div>
+                <h1 className="mt-4 text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-sky-600 via-teal-500 to-sky-600 bg-clip-text text-transparent">
+                    Evaluación de Obesidad Infantil
+                </h1>
+                <p className="mt-2 text-sm text-gray-500">
+                    Calcula métricas de obesidad y genera un plan alimenticio adaptado.
+                </p>
+            </header>
+
+            <main className="w-full max-w-4xl mx-auto px-4 pb-16">
+                {view === "form" ? (
+                    <div className="rounded-2xl border border-sky-100/80 bg-white/70 backdrop-blur-xl shadow-lg p-0 overflow-hidden">
+                        {/* Card accent strip */}
+                        <div className="h-1.5 bg-gradient-to-r from-sky-400 via-teal-400 to-sky-400" />
+                        <div className="p-6">
+                            <EvaluationForm onComplete={handleComplete} />
+                        </div>
+                    </div>
+                ) : (
+                    <div className="space-y-6">
+                        <div className="rounded-2xl border border-sky-100/80 bg-white/70 backdrop-blur-xl shadow-lg p-6">
+                            <ResultsCard results={results} />
+                        </div>
+                        {mealplan && (
+                            <div className="rounded-2xl border border-sky-100/80 bg-white/70 backdrop-blur-xl shadow-lg p-6">
+                                <MealPlanViewer plan={mealplan} />
+                            </div>
+                        )}
+                        <div className="flex justify-center">
+                            <button
+                                onClick={handleBack}
+                                className="inline-flex items-center justify-center px-5 py-2 rounded-full font-medium border border-gray-300 bg-white/80 hover:bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-sky-200"
+                            >
+                                ← Volver
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </main>
+        </div>
     );
-}
+};
+
+export default App;
