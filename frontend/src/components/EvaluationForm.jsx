@@ -91,18 +91,11 @@ const EvaluationForm = ({ onComplete }) => {
             onSubmit={handleSubmit}
             className="rounded-xl border border-sky-100/80 bg-white/70 backdrop-blur shadow-sm text-sm text-gray-800 divide-y divide-slate-100"
         >
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3">
-                <h2 className="text-lg font-semibold tracking-tight text-sky-700">
-                    🧸 Evaluación
-                </h2>
-            </div>
-
             {/* Datos del niño */}
             <div className="px-4 py-4 space-y-3">
                 <div className="flex items-center gap-2">
                     <div className="h-6 w-6 rounded-full grid place-items-center bg-sky-100 text-sky-700">
-                        🧸
+                        👶
                     </div>
                     <span className="text-sm font-semibold tracking-tight text-sky-700">
                         Datos del niño
@@ -176,7 +169,7 @@ const EvaluationForm = ({ onComplete }) => {
                     </div>
                 </div>
                 <p className="text-[11px] text-slate-500">
-                    Usa una báscula reciente si es posible.
+                    Usa punto decimal
                 </p>
             </div>
 
@@ -209,7 +202,7 @@ const EvaluationForm = ({ onComplete }) => {
                     </div>
                 </div>
                 <p className="text-[11px] text-slate-500">
-                    Mide sin zapatos, en pared recta.
+                    Usa punto decimal
                 </p>
             </div>
 

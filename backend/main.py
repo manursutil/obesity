@@ -375,6 +375,7 @@ def generate_mealplan(input: EvaluationInput, actividad: Literal["sedentario", "
         - Usa alimentos comunes y sencillos de preparar.
         - Mantén variedad entre días.
         - No incluyas texto explicativo fuera del JSON.
+        - La dieta debe ser adaptada a un público predominantemente canario, latinoamericano y marroquí.
 
         Guía nutricional de referencia:
         {json.dumps(referencias, indent=2, ensure_ascii=False)}
