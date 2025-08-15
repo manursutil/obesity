@@ -2,13 +2,9 @@
 
 This is a web application built to assist pediatricians in evaluating a child's growth metrics and generating personalized weekly meal plans based on WHO standards. It is designed to be used by a healthcare professional (in this case, my mother) in clinical practice.
 
-🚧 Work in progress
-
-✅ Core functionality complete
-
 🧠 Improvements and refinements ongoing
 
-### Features 
+### Features
 
 Anthropometric Evaluation:
 
@@ -27,6 +23,14 @@ Privacy-first Design:
 - No user login or data persistence
 - All calculations are performed locally or within a secure API session
 - Designed for private use only (not publicly hosted)
+
+### Screenshots
+
+![Screenshot 1](./screenshots/1.png)
+
+![Screenshot 2](./screenshots/2.png)
+
+![Screenshot 3](./screenshots/3.png)
 
 ### Tech Stack
 
